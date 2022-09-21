@@ -1,28 +1,30 @@
 <template>
-    <el-table ref="tableRef" row-key="controlId" :data="controlData" style="width: 100%">
+    <el-table ref="tableRef" row-key="reactorId" :data="reactorData" style="width: 100%">
         <el-table-column
-            prop="ControlId"
-            label="ControlId"
+            prop="reactorId"
+            label="Reactor"
             sortable
-            width="180"
-            column-key="ControlId"
+            column-key="reactorId"
             :filters="[
                 { text: 'S3.2', value: 'S3.2' },
                 { text: 'RDS.11', value: 'RDS.11' }
             ]"
             :filter-method="filterHandler"
         />
-        <el-table-column prop="Title" label="Title" width="200" />
-        <el-table-column prop="ControlStatus" label="ControlStatus" width="180" />
+        <el-table-column prop="controlId" label="ControlId" />
+        <el-table-column prop="description" label="Description" />
         <!-- <el-table-column prop="RelatedRequirements" label="RelatedRequirements" width="180" /> -->
-        <el-table-column prop="SeverityRating" label="SeverityRating" width="180" />
-        <el-table-column prop="Reactor" label="Reactor" width="180" />
-        <el-table-column label="Operations">
+        <el-table-column label="Actions">
             <template #default="scope">
+                <!-- <el-button 
+                size="small" 
+                @click="handleConfigure(scope.$index, scope.row)"
+                >Update</el-button
+                > -->
                 <el-button 
                 size="small" 
                 @click="handleConfigure(scope.$index, scope.row)"
-                >Configure</el-button
+                >Install</el-button
                 >
             </template>
         </el-table-column>
@@ -35,23 +37,20 @@ import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { da } from 'element-plus/es/locale';
 
-const url = "https://g8bfit35p3.execute-api.ap-southeast-1.amazonaws.com/dev/resources/controls";
+const url = "https://g8bfit35p3.execute-api.ap-southeast-1.amazonaws.com/dev/resources/reactors";
 const { data: resp, pending, refresh, error } = await useFetch(url);
 console.log(resp.value)
-let controlData: Control[] = reactive(resp.value.data);
+let reactorData: Reactor[] = reactive(resp.value.data);
 
-interface Control {
+interface Reactor {
   RelatedRequirements: Array<string>;
-  Title: string;
-  RemediationUrl: string;
-  ControlStatus: string;
+  repo: string;
+  reactorId: string;
   updatedAt: string;
-  SeverityRating: string;
-  ControlStatusUpdatedAt: string;
-  ControlId: string;
   createdAt: string;
-  StandardsControlArn: string;
-  Description: string;
+  controlId: string;
+  description: string;
+  resource: Map<string,string>;
 }
 
 const filterHandler = (data) =>  {
