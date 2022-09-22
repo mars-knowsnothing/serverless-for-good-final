@@ -1,0 +1,85 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "Parse Security Hub Finding",
+  "States": {
+    "Parse Security Hub Finding": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload": {
+          "findings.$": "$.detail.findings"
+        },
+        "FunctionName": "arn:aws:lambda:ap-southeast-1:592336536196:function:ouroboros_ims_step_parse_finding:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Process Findings"
+    },
+    "Process Findings": {
+      "Type": "Map",
+      "Iterator": {
+        "StartAt": "Execute Security Hub Finding Reactor",
+        "States": {
+          "Execute Security Hub Finding Reactor": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+              "Payload.$": "$",
+              "FunctionName": "arn:aws:lambda:ap-southeast-1:592336536196:function:ouroboros_ims_step_dispatch_finding:$LATEST"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+              }
+            ],
+            "Next": "Send Notification"
+          },
+          "Send Notification": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+              "Payload": {
+                "messages.$":"$.result.messages"
+              },
+              "FunctionName": "arn:aws:lambda:ap-southeast-1:592336536196:function:ouroboros_ims_step_send_notification:$LATEST"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+              }
+            ],
+            "End": true
+          }
+        }
+      },
+      "End": true
+    }
+  }
+}
