@@ -1,13 +1,13 @@
 <template>
     <div class="common-layout">
         <el-container>
-            <el-header><h1>Reactors</h1></el-header>
+            <el-header><h1>Ouroboros - Security Reactor Framework</h1></el-header>
             <el-container>
                 <el-aside width="200px">
-                    <SideMenu/>
+                    <SideMenu active-item="/repo/local"/>
                 </el-aside>
                 <el-main>
-                    <ReactorsTable />
+                    <LocalReactorsTable />
                 </el-main>
             </el-container>
         </el-container>
