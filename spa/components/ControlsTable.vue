@@ -17,13 +17,19 @@
       { text: 'CRITICAL', value: 'CRITICAL' }
     ]" :filter-method="filterHandler" label="SeverityRating" width="180">
       <template #default="scope">
-        <el-button link v-if="scope.row.SeverityRating == 'LOW'" type="info">{{ scope.row.SeverityRating.toLowerCase() }}</el-button>
+        <el-button link v-if="scope.row.SeverityRating == 'LOW'" type="info">{{ scope.row.SeverityRating.toLowerCase()
+        }}</el-button>
 
-        <el-button link v-if="scope.row.SeverityRating == 'MEDIUM'">{{ scope.row.SeverityRating.toLowerCase() }}</el-button>
+        <el-button link v-if="scope.row.SeverityRating == 'MEDIUM'">{{ scope.row.SeverityRating.toLowerCase() }}
+        </el-button>
 
-        <el-button link v-if="scope.row.SeverityRating == 'HIGH'" type="warning">{{ scope.row.SeverityRating.toLowerCase() }}</el-button>
+        <el-button link v-if="scope.row.SeverityRating == 'HIGH'" type="warning">{{
+            scope.row.SeverityRating.toLowerCase()
+        }}</el-button>
 
-        <el-button link v-if="scope.row.SeverityRating == 'CRITICAL'" type="danger">{{ scope.row.SeverityRating.toLowerCase() }}</el-button>
+        <el-button link v-if="scope.row.SeverityRating == 'CRITICAL'" type="danger">{{
+            scope.row.SeverityRating.toLowerCase()
+        }}</el-button>
       </template>
     </el-table-column>
     <el-table-column prop="ReactorId" label="ReactorId" width="180" />
@@ -65,10 +71,11 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { da } from 'element-plus/es/locale';
 import type { TableColumnCtx } from 'element-plus/es/components/table/src/table-column/defaults'
 import { env } from 'process';
+import { ElNotification } from 'element-plus'
 
 const dialogConfigureFormVisible = ref(false);
 const updateControlPayload = reactive({
-  ReactorId: ''
+  ReactorId: 'not configured'
 })
 const selectedControl = reactive(
   {
@@ -130,8 +137,13 @@ const updateControl = async () => {
     //   'x-api-key': updateControlPayload.value
     // }
   })
+  ElNotification({
+    title: 'Control Settings',
+    message: 'Configuration Updated',
+    type: 'success',
+  })
   console.log(resp)
-  dialogConfigureFormVisible.value=false
+  dialogConfigureFormVisible.value = false
 }
 const handleConfigure = (index, row) => {
   dialogConfigureFormVisible.value = true
@@ -142,68 +154,6 @@ const handleConfigure = (index, row) => {
 const handleDelete = (index, row) => {
   console.log()
 }
-
-const states = [
-  'Alabama',
-  'Alaska',
-  'Arizona',
-  'Arkansas',
-  'California',
-  'Colorado',
-  'Connecticut',
-  'Delaware',
-  'Florida',
-  'Georgia',
-  'Hawaii',
-  'Idaho',
-  'Illinois',
-  'Indiana',
-  'Iowa',
-  'Kansas',
-  'Kentucky',
-  'Louisiana',
-  'Maine',
-  'Maryland',
-  'Massachusetts',
-  'Michigan',
-  'Minnesota',
-  'Mississippi',
-  'Missouri',
-  'Montana',
-  'Nebraska',
-  'Nevada',
-  'New Hampshire',
-  'New Jersey',
-  'New Mexico',
-  'New York',
-  'North Carolina',
-  'North Dakota',
-  'Ohio',
-  'Oklahoma',
-  'Oregon',
-  'Pennsylvania',
-  'Rhode Island',
-  'South Carolina',
-  'South Dakota',
-  'Tennessee',
-  'Texas',
-  'Utah',
-  'Vermont',
-  'Virginia',
-  'Washington',
-  'West Virginia',
-  'Wisconsin',
-  'Wyoming',
-]
-
-interface ListItem {
-  value: string
-  label: string
-}
-
-const list = states.map((item): ListItem => {
-  return { value: `value:${item}`, label: `label:${item}` }
-})
 
 interface Reactor {
   RelatedRequirements: Array<string>;

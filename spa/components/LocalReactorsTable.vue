@@ -20,9 +20,12 @@
                 @click="handleConfigure(scope.$index, scope.row)"
                 >Update</el-button
                 > -->
-                <el-button size="small" link type="success" @click="handleUpdate(scope.$index, scope.row)">Update
+                <el-button v-if="scope.row.installationStatusColor" size="small" link
+                    :type="scope.row.installationStatusColor" @click="handleUninstall(scope.$index, scope.row)">
+                    {{ scope.row.installationStatus }}
                 </el-button>
-                <el-button size="small" link type="danger" @click="handleUninstall(scope.$index, scope.row)">Uninstall
+                <el-button v-else size="small" link type="danger" @click="handleUninstall(scope.$index, scope.row)">
+                    Uninstall
                 </el-button>
 
 
@@ -35,6 +38,8 @@
 <script lang="tsx" setup>
 import { ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElNotification } from 'element-plus'
+
 import { da } from 'element-plus/es/locale';
 import type { TableColumnCtx } from 'element-plus/es/components/table/src/table-column/defaults'
 
@@ -70,8 +75,41 @@ const filterHandler = (
     console.log(data);
 }
 
-const handleUninstall = (index, row) => {
+const installationStatus = ref("Uninstall");
+const installationStatusColor = ref("danger");
+
+
+const handleUninstall = async (index, row) => {
     console.log(index, row)
+    row.installationStatus = "Uninstalling"
+    row.installationStatusColor = "warning"
+    ElNotification({
+        title: 'Reactor Installer',
+        message: 'Uninstallation Started',
+        type: 'info',
+    })
+    const { data: resp } = await useFetch(
+        "https://g8bfit35p3.execute-api.ap-southeast-1.amazonaws.com/dev/resources/reactors/" + row.reactorId,
+        {
+            method: "delete"
+        }
+    )
+    ElNotification({
+        title: 'Reactor Installer',
+        message: 'Uninstallation Completed',
+        type: 'success',
+    })
+    row.installationStatus = "install"
+    row.installationStatusColor = "primary"
+    // setTimeout(() => {
+    //     ElNotification({
+    //         title: 'Reactor Installer',
+    //         message: 'Uninstallation Completed',
+    //         type: 'success',
+    //     })
+    //     row.installationStatus = "install"
+    //     row.installationStatusColor = "primary"
+    // }, 5000);
 }
 const handleUpdate = (index, row) => {
     console.log(index, row)
